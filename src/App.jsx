@@ -26,7 +26,6 @@ const App = () => {
     setData({ value: inputValue, flag: inputFlag });
   };
 
-
   const handleChangeName = () => {
     // Получаем значение инпута через inputRef.current.value
     const inputValue = inputRefName.current.value;
@@ -85,6 +84,7 @@ const App = () => {
       <main>
         <h2>Список товара</h2>
         <TestTwo flag={x}></TestTwo>
+        {/* <TestTwo flag={x}></TestTwo> */}
       </main>
     </>
   );
