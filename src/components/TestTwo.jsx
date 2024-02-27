@@ -1,48 +1,47 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { authString } from "./../helpers/authString";
-import { removeDuplicates } from "../helpers/removeDuplicates";
-import { Spin } from "../components/Spin";
-import { NumPogin } from "./NumPogin";
+import { authString } from "./../helpers/authString"; //  кодировка токена авторизации
+import { removeDuplicates } from "../helpers/removeDuplicates"; // функция которая удаляет елемента с одинаковыми id
+import { Spin } from "../components/Spin"; // этот спинер показан во время запроса
+import { Pagination } from "./Pagination"; // тут отрисовывается пагинация
 
-const URL = "http://api.valantis.store:40000/";
+const API_URL = "http://api.valantis.store:40000/";
 
 export const TestTwo = ({ flag }) => {
-  const [finalResult, setFinalResult] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [errorView, setErrorView] = useState(null);
-  const [pagin, setPagin] = useState(0);
-  const [arrayData, setArrayData] = useState([]);
-
-  const valueSee = 50;
+  const [displayedProducts, setDisplayedProducts] = useState(null); //результат который отрисовывается на странице
+  const [loading, setLoading] = useState(true); // состояние загрузки когда показывать спинер
+  const [firstRequestError, setFirstRequestError] = useState(null); // состояние ошибок при первом запросе
+  const [secondRequestError, setSecondRequestError] = useState(null); //  состояние ошибок при втором запросе
+  const [currentPageNumber, setCurrentPageNumber] = useState(0); // номер на котором находиться пагинация в настоящем времени
+  const [arrayData, setArrayData] = useState([]); // сюда записывается результам после первого запроса
+  const itemsPerPage = 10; // сколько показывать карточек на одной странице
   let defaultFilter = {
     action: "get_ids",
     params: {
       offset: 0,
-      limit: 50,
+      limit: 100,
     },
   };
-  let filterPrice = {
+  let filterByPrice = {
     action: "filter",
     params: {
       price: Number(flag.value),
     },
   };
-  let filterBrand = {
+  let filterByBrand = {
     action: "filter",
     params: {
       brand: flag.value,
     },
   };
-  let filterName = {
+  let filterByName = {
     action: "filter",
     params: {
       product: flag.value,
     },
   };
 
-  const [flagValue, setFlagValue] = useState(defaultFilter);
+  const [filterOptions, setFilterOptions] = useState(defaultFilter); // настройка body для первого запроса
 
   useEffect(() => {
     let action;
@@ -51,81 +50,67 @@ export const TestTwo = ({ flag }) => {
         action = defaultFilter;
         break;
       case 2:
-        action = filterPrice;
+        action = filterByPrice;
         break;
       case 3:
-        action = filterBrand;
+        action = filterByBrand;
         break;
       case 4:
-        action = filterName;
+        action = filterByName;
         break;
 
       default:
         action = defaultFilter;
     }
 
-    setFlagValue(action);
+    setFilterOptions(action);
   }, [flag]);
 
   useEffect(() => {
-    setError(null); // Сбрасываем состояние ошибки, если оно было
+    setFirstRequestError(null); // Сбрасываем состояние ошибки, если оно было
     setLoading(true);
 
-    const fetchData = async () => {
+    const firstRequest = async () => {
       try {
-        // Отправляем данные на сервер
-
-        const response1 = await axios.post(URL, flagValue, {
+        const response1 = await axios.post(API_URL, filterOptions, {
           headers: {
             "Content-Type": "application/json",
             "X-Auth": authString(),
           },
         });
-        // После получения ответа от сервера, извлекаем необходимые данные
         const extractedData = response1.data.result;
-        // arrayWWW(extractedData);
-
         sessionStorage.setItem(
-          "pagin",
-          Math.ceil(extractedData.length / valueSee)
+          "currentPageNumber",
+          Math.ceil(extractedData.length / itemsPerPage)
         );
-
-        // console.log(extractedData);
         setArrayData(extractedData);
       } catch (error) {
-        // Обрабатываем ошибку, если возникла
-
-        setError(error.message);
+        setFirstRequestError(error.message);
       } finally {
-        if (error === null) {
+        if (firstRequestError === null) {
           setLoading(false);
         }
-        if (error !== null) {
+        if (firstRequestError !== null) {
           setLoading(true);
         }
       }
     };
 
-    fetchData();
-
-    // Вызываем функцию fetchData при монтировании компонента
-  }, [flagValue, error]);
+    firstRequest();
+  }, [filterOptions, firstRequestError]);
   useEffect(() => {
+    setSecondRequestError(null); // Сбрасываем состояние ошибки, если оно было
     setLoading(true);
-    async function qwe123() {
-      // valueSee сколько отображать на странице
-      // pagin число нажатой пагинации
-      const y = pagin * valueSee;
-      const newArr = arrayData.slice(y, y + valueSee);
+    async function secondRequest() {
+      // itemsPerPage  сколько отображать на странице
+      // currentPageNumber число нажатой пагинации
+      const y = currentPageNumber * itemsPerPage;
+      const newArr = arrayData.slice(y, y + itemsPerPage);
       try {
         const response2 = await axios.post(
-          URL,
+          API_URL,
+          { action: "get_items", params: { ids: newArr } },
           {
-            action: "get_items",
-            params: { ids: newArr },
-          },
-          {
-            // Отправляем запрос на сервер
             headers: {
               "Content-Type": "application/json",
               "X-Auth": authString(),
@@ -136,29 +121,27 @@ export const TestTwo = ({ flag }) => {
         // Обрабатываем итоговый ответ от сервера и удаляем товар с одинаковыми id
         const finalResultFromServer = removeDuplicates(response2.data.result);
         // Устанавливаем итоговый результат в состояние компонента
-        setFinalResult(finalResultFromServer);
+        setDisplayedProducts(finalResultFromServer);
       } catch (error) {
-        setErrorView(error.message);
+        setSecondRequestError(error.message);
       } finally {
-        if (error === null) {
+        if (secondRequestError === null) {
           setLoading(false);
         }
-        if (error !== null) {
+        if (secondRequestError !== null) {
           setLoading(true);
         }
       }
-
-      setErrorView(null); // Сбрасываем состояние ошибки, если оно было
     }
-    if (arrayData.length > 0) qwe123();
-  }, [pagin, arrayData, errorView]);
+    if (arrayData.length > 0) secondRequest();
+  }, [currentPageNumber, arrayData, secondRequestError]);
 
   return (
     <>
       <div style={{ position: "relative" }}>
         {!loading ? (
-          finalResult &&
-          finalResult.map((el, index) => (
+          displayedProducts &&
+          displayedProducts.map((el, index) => (
             <div key={`div-${index}`}>
               <ul key={`ui-${index}`}>
                 <li key={`li-brand-${index}`}>
@@ -173,7 +156,9 @@ export const TestTwo = ({ flag }) => {
         ) : (
           <Spin />
         )}
-        <NumPogin usePagin={{ setPagin, pagin }} />
+        <Pagination
+          usePagination={{ setCurrentPageNumber, currentPageNumber }}
+        />
       </div>
     </>
   );
