@@ -1,6 +1,4 @@
-export const arrayWWW = (data, num) => {
-const length=data.length
-
-const numStr =length/num
-
+export const arrayWWW = (data) => {
+  sessionStorage.setItem('data', JSON.stringify(data));
+  sessionStorage.setItem("dataLength", data.length);
 };
