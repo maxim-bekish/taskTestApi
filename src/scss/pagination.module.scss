@@ -1,0 +1,41 @@
+.wrapper {
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .pagination {
+    padding: 0 10px;
+    display: flex;
+    column-gap: 5px;
+    .item {
+      cursor: pointer;
+      color: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid black;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      list-style: none;
+
+      &:last-child,
+      &:first-child {
+        border-radius: 0;
+        width: 70px;
+      }
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+    }
+    .itemActive {
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+        color: black;
+      }
+      color: white;
+      background-color: black;
+    }
+  }
+}

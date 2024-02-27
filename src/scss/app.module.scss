@@ -1,0 +1,52 @@
+.allFilter {
+  display: flex;
+  flex-direction: column;
+  row-gap: 5px;
+  li {
+    button {
+      background-color: #fff0f0b0;
+      max-width: 150px;
+      box-sizing: border-box;
+      font-size: 18px;
+      padding: 7px 12px;
+      border-radius: 30px;
+      border: 1px solid #b2b2b2;
+      &:hover {
+        background-color: #ffd9d9;
+      }
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0; /* Убираем отступы, создаваемые стрелками */
+    }
+
+    input {
+      border: 0;
+      font-size: 20px;
+      padding: 5px 15px;
+      border-radius: 30px;
+      box-shadow: inset 1px 0px 12px 0px #a1a1bf7d;
+      &:focus-visible {
+        outline: none;
+        box-shadow: inset 1px 0px 12px 0px #a6e1c3;
+      }
+      &:hover {
+        box-shadow: inset 1px 0px 12px 0px #a6afe191;
+      }
+    }
+  }
+}
+.buttonRequests {
+  max-width: 150px;
+  background-color: rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+  font-size: 18px;
+  padding: 7px 12px;
+  border-radius: 30px;
+  border: 1px solid #b2b2b2;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.15);
+  }
+}

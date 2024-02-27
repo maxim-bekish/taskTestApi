@@ -1,90 +1,126 @@
 import { useState, useRef } from "react";
-import { TestTwo } from "./components/TestTwo";
+import "./scss/allStyle.scss";
+import { Content } from "./components/Content";
+import st from "./scss/app.module.scss";
 
 const App = () => {
   const inputRefPrice = useRef(null);
   const inputRefBrand = useRef(null);
   const inputRefName = useRef(null);
-  const [data, setData] = useState({ value: null, flag: 1 });
-  const [x, setX] = useState(data);
+  const [flag, setFlag] = useState({ value: null, flag: 1 });
+  const [disabledButton, setDisabledButton] = useState(true);
+  const [buttonRequests, setButtonRequests] = useState(flag);
   const funPrice = () => {
-    setX(data);
+    setButtonRequests(flag);
     inputRefPrice.current.value = "";
     inputRefBrand.current.value = "";
   };
 
-  const handleChangePrice = () => {
+  const handleChange = (e) => {
     // Получаем значение инпута через inputRef.current.value
-    const inputValue = inputRefPrice.current.value;
-    const inputFlag = inputRefPrice.current.getAttribute("flag");
-    setData({ value: inputValue, flag: inputFlag });
-  };
-  const handleChangeBrand = () => {
-    // Получаем значение инпута через inputRef.current.value
-    const inputValue = inputRefBrand.current.value;
-    const inputFlag = inputRefBrand.current.getAttribute("flag");
-    setData({ value: inputValue, flag: inputFlag });
+
+    const inputValue = e.target.value;
+
+
+
+
+
+
+
+
+
+
+
+
+    // настороить валидацию
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    setDisabledButton();
+
+    const inputFlag = e.target.getAttribute("flag");
+    setFlag({ value: inputValue, flag: inputFlag });
   };
 
-  const handleChangeName = () => {
-    // Получаем значение инпута через inputRef.current.value
-    const inputValue = inputRefName.current.value;
-    const inputFlag = inputRefName.current.getAttribute("flag");
-    setData({ value: inputValue, flag: inputFlag });
-  };
-
+  function noDigits(event) {
+    if ("1234567890".indexOf(event.key) != -1) event.preventDefault();
+  }
   return (
     <>
-      <header>
-        <nav>
-          <ul>
-            <li>
-              <button
-                flag="1"
-                onClick={(event) =>
-                  setX({ value: null, flag: event.target.getAttribute("flag") })
-                }
-              >
-                Сбросить фильтр
-              </button>
-            </li>
-            <li>
-              <input
-                flag="2"
-                ref={inputRefPrice}
-                onChange={handleChangePrice}
-                placeholder="price"
-                type="number"
-              ></input>
-            </li>
-            <li>
-              <input
-                flag="3"
-                ref={inputRefBrand}
-                onChange={handleChangeBrand}
-                placeholder="brand"
-                type="text"
-              ></input>
-            </li>
-            <li>
-              <input
-                flag="4"
-                ref={inputRefName}
-                onChange={handleChangeName}
-                placeholder="Name"
-                type="text"
-              ></input>
-            </li>
-
-            <button onClick={funPrice}>search</button>
-            <div>{x.value ? `фильтр по ${x.value}` : "Без фильтра"}</div>
-          </ul>
-        </nav>
+      <header className="container header">
+        <ul className={st.allFilter}>
+          <li>
+            <button
+              flag="NoFilter"
+              onClick={(event) =>
+                setButtonRequests({
+                  value: null,
+                  flag: event.target.getAttribute("flag"),
+                })
+              }
+            >
+              Reset filters
+            </button>
+          </li>
+          <li>
+            <input
+              min="1"
+              flag="Price"
+              ref={inputRefPrice}
+              onChange={(e) => handleChange(e)}
+              placeholder="Price"
+              type="number"
+            ></input>
+          </li>
+          <li>
+            <input
+              flag="Brand"
+              ref={inputRefBrand}
+              onChange={(e) => handleChange(e)}
+              placeholder="Brand"
+              type="text"
+            ></input>
+          </li>
+          <li>
+            <input
+              flag="Name"
+              ref={inputRefName}
+              onChange={(e) => handleChange(e)}
+              placeholder="Name"
+              type="text"
+              onKeyPress={(event) => noDigits(event)}
+            ></input>
+          </li>
+        </ul>
+        <button
+          disabled={disabledButton}
+          className={st.buttonRequests}
+          onClick={funPrice}
+        >
+          Search
+        </button>
+        <div>
+          {buttonRequests.value
+            ? `Filter: ${buttonRequests.value}`
+            : "No filter"}
+        </div>
       </header>
-      <main>
+      <main className="main container">
         <h2>Список товара</h2>
-        <TestTwo flag={x}></TestTwo>
-        {/* <TestTwo flag={x}></TestTwo> */}
+        <Content flag={buttonRequests}></Content>
       </main>
     </>
   );

@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { authString } from "./../helpers/authString"; //  кодировка токена авторизации
+import st from "./../scss/cards.module.scss";
+import { authString } from "../helpers/authString"; //  кодировка токена авторизации
 import { removeDuplicates } from "../helpers/removeDuplicates"; // функция которая удаляет елемента с одинаковыми id
-import { Spin } from "../components/Spin"; // этот спинер показан во время запроса
+import { Spin } from "./Spin"; // этот спинер показан во время запроса
 import { Pagination } from "./Pagination"; // тут отрисовывается пагинация
-
+sessionStorage.removeItem("currentPageNumber");
 const API_URL = "http://api.valantis.store:40000/";
+const itemsPerPage = 50; // сколько показывать карточек на одной странице
 
-export const TestTwo = ({ flag }) => {
+export const Content = ({ flag }) => {
   const [displayedProducts, setDisplayedProducts] = useState(null); //результат который отрисовывается на странице
   const [loading, setLoading] = useState(true); // состояние загрузки когда показывать спинер
   const [firstRequestError, setFirstRequestError] = useState(null); // состояние ошибок при первом запросе
   const [secondRequestError, setSecondRequestError] = useState(null); //  состояние ошибок при втором запросе
   const [currentPageNumber, setCurrentPageNumber] = useState(0); // номер на котором находиться пагинация в настоящем времени
   const [arrayData, setArrayData] = useState([]); // сюда записывается результам после первого запроса
-  const itemsPerPage = 10; // сколько показывать карточек на одной странице
   let defaultFilter = {
     action: "get_ids",
     params: {
@@ -45,17 +46,17 @@ export const TestTwo = ({ flag }) => {
 
   useEffect(() => {
     let action;
-    switch (Number(flag.flag)) {
-      case 1:
+    switch (flag.flag) {
+      case "NoFilter":
         action = defaultFilter;
         break;
-      case 2:
+      case "Price":
         action = filterByPrice;
         break;
-      case 3:
+      case "Brand":
         action = filterByBrand;
         break;
-      case 4:
+      case "Name":
         action = filterByName;
         break;
 
@@ -78,12 +79,16 @@ export const TestTwo = ({ flag }) => {
             "X-Auth": authString(),
           },
         });
-        const extractedData = response1.data.result;
+
+        //  const xxx111= removeDuplicates(extractedData);
+        let uniqueArray = [...new Set(response1.data.result)];
+
         sessionStorage.setItem(
           "currentPageNumber",
-          Math.ceil(extractedData.length / itemsPerPage)
+          Math.round((uniqueArray.length + 1) / itemsPerPage)
         );
-        setArrayData(extractedData);
+
+        setArrayData(uniqueArray);
       } catch (error) {
         setFirstRequestError(error.message);
       } finally {
@@ -105,6 +110,7 @@ export const TestTwo = ({ flag }) => {
       // itemsPerPage  сколько отображать на странице
       // currentPageNumber число нажатой пагинации
       const y = currentPageNumber * itemsPerPage;
+
       const newArr = arrayData.slice(y, y + itemsPerPage);
       try {
         const response2 = await axios.post(
@@ -121,6 +127,7 @@ export const TestTwo = ({ flag }) => {
         // Обрабатываем итоговый ответ от сервера и удаляем товар с одинаковыми id
         const finalResultFromServer = removeDuplicates(response2.data.result);
         // Устанавливаем итоговый результат в состояние компонента
+
         setDisplayedProducts(finalResultFromServer);
       } catch (error) {
         setSecondRequestError(error.message);
@@ -138,28 +145,32 @@ export const TestTwo = ({ flag }) => {
 
   return (
     <>
-      <div style={{ position: "relative" }}>
-        {!loading ? (
-          displayedProducts &&
-          displayedProducts.map((el, index) => (
-            <div key={`div-${index}`}>
-              <ul key={`ui-${index}`}>
-                <li key={`li-brand-${index}`}>
-                  {el.brand ? el.brand : "null"}
-                </li>
-                <li key={`li-price-${index}`}>{el.price}</li>
-                <li key={`li-product-${index}`}>{el.product}</li>
-                <li key={`li-id-${index}`}>{el.id}</li>
-              </ul>
-            </div>
-          ))
-        ) : (
-          <Spin />
-        )}
-        <Pagination
-          usePagination={{ setCurrentPageNumber, currentPageNumber }}
-        />
+      <Pagination usePagination={{ setCurrentPageNumber, currentPageNumber }} />
+      <div className={`${st.wrapper} ${loading ? st.wrapperActive : ""}`}>
+        <div className={st.cards}>
+          {loading && <Spin />}
+          {displayedProducts &&
+            displayedProducts.map((el, index) => (
+              <div className={st.card} key={`div-${index}`}>
+                <ul key={`ui-${index}`}>
+                  <li key={`li-brand-${index}`}>
+                    <span> Brand:</span> {el.brand ? el.brand : "not specified"}
+                  </li>
+                  <li key={`li-price-${index}`}>
+                    <span> Price:</span> {el.price}
+                  </li>
+                  <li key={`li-product-${index}`}>
+                    <span> Name:</span> {el.product}
+                  </li>
+                  <li key={`li-id-${index}`}>
+                    <span> Id:</span> {el.id}
+                  </li>
+                </ul>
+              </div>
+            ))}
+        </div>
       </div>
+      <Pagination usePagination={{ setCurrentPageNumber, currentPageNumber }} />
     </>
   );
 };
