@@ -1,18 +1,9 @@
 .wrapper {
   color: black;
 }
-// .wrapperActive {
-//   position: absolute;
-//   z-index: 1;
-//   width: 100vw;
-//   height: 100vh;
-//   background-color: rgba(0, 0, 0, 0.401);
-// }
 
 .cards {
   gap: 15px;
-  // max-width: 100%;
-  // position: relative;
   display: flex;
   width: 100%;
   flex-wrap: wrap;
@@ -24,7 +15,7 @@
     padding: 10px;
     transition: all 200ms;
     &:hover {
-        transition: all 200ms;
+      transition: all 200ms;
       transform: scale(1.05);
     }
     ul {

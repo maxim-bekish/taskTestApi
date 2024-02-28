@@ -1,58 +1,26 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "./scss/allStyle.scss";
 import { Content } from "./components/Content";
 import st from "./scss/app.module.scss";
 
 const App = () => {
-  const inputRefPrice = useRef(null);
-  const inputRefBrand = useRef(null);
-  const inputRefName = useRef(null);
-  const [flag, setFlag] = useState({ value: null, flag: 1 });
-  const [disabledButton, setDisabledButton] = useState(true);
-  const [buttonRequests, setButtonRequests] = useState(flag);
+  const [price, setPrice] = useState("");
+  const [brand, setBrand] = useState("");
+  const [name, setName] = useState("");
+  const [flag, setFlag] = useState({ value: null, flag: "NoFilter" });
+
   const funPrice = () => {
-    setButtonRequests(flag);
-    inputRefPrice.current.value = "";
-    inputRefBrand.current.value = "";
-  };
-
-  const handleChange = (e) => {
-    // Получаем значение инпута через inputRef.current.value
-
-    const inputValue = e.target.value;
-
-
-
-
-
-
-
-
-
-
-
-
-    // настороить валидацию
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    setDisabledButton();
-
-    const inputFlag = e.target.getAttribute("flag");
-    setFlag({ value: inputValue, flag: inputFlag });
+    const filledFields = [
+      { value: price, name: "Price" },
+      { value: brand, name: "Brand" },
+      { value: name, name: "Name" },
+    ].filter((field) => field.value);
+    setPrice("");
+    setBrand("");
+    setName("");
+    if (filledFields.length === 1) setFlag(filledFields[0]);
+    if (filledFields.length > 1) alert("Только одно поле");
+    if (filledFields.length === 0) alert("Введите 1 поле");
   };
 
   function noDigits(event) {
@@ -64,13 +32,15 @@ const App = () => {
         <ul className={st.allFilter}>
           <li>
             <button
-              flag="NoFilter"
-              onClick={(event) =>
-                setButtonRequests({
+              onClick={(event) => {
+                setFlag({
                   value: null,
-                  flag: event.target.getAttribute("flag"),
-                })
-              }
+                  flag: "NoFilter",
+                });
+                setPrice("");
+                setBrand("");
+                setName("");
+              }}
             >
               Reset filters
             </button>
@@ -78,49 +48,39 @@ const App = () => {
           <li>
             <input
               min="1"
-              flag="Price"
-              ref={inputRefPrice}
-              onChange={(e) => handleChange(e)}
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
               placeholder="Price"
               type="number"
             ></input>
           </li>
           <li>
             <input
-              flag="Brand"
-              ref={inputRefBrand}
-              onChange={(e) => handleChange(e)}
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
               placeholder="Brand"
               type="text"
             ></input>
           </li>
           <li>
             <input
-              flag="Name"
-              ref={inputRefName}
-              onChange={(e) => handleChange(e)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Name"
               type="text"
               onKeyPress={(event) => noDigits(event)}
             ></input>
           </li>
         </ul>
-        <button
-          disabled={disabledButton}
-          className={st.buttonRequests}
-          onClick={funPrice}
-        >
+        <button className={st.buttonRequests} onClick={funPrice}>
           Search
         </button>
-        <div>
-          {buttonRequests.value
-            ? `Filter: ${buttonRequests.value}`
-            : "No filter"}
-        </div>
+
+        <div>{flag.value ? `Filter: ${flag.value}` : "No filter"}</div>
       </header>
       <main className="main container">
         <h2>Список товара</h2>
-        <Content flag={buttonRequests}></Content>
+        <Content flag={flag}></Content>
       </main>
     </>
   );
