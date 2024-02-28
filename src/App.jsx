@@ -24,7 +24,11 @@ const App = () => {
   };
 
   function noDigits(event) {
-    if ("1234567890".indexOf(event.key) != -1) event.preventDefault();
+    if ("1234567890".indexOf(event.key) !== -1) event.preventDefault();
+  }
+  function noMinusNum(event) {
+   if ("-".indexOf(event.key) !== -1) event.preventDefault();
+    // if (Number(event.target.value) < 1) event.target.value='';
   }
   return (
     <>
@@ -48,6 +52,7 @@ const App = () => {
           <li>
             <input
               min="1"
+              onKeyPress={(event) => noMinusNum(event)}
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="Price"
@@ -76,7 +81,11 @@ const App = () => {
           Search
         </button>
 
-        <div>{flag.value ? `Filter: ${flag.value}` : "No filter"}</div>
+        <div>
+          {flag.value
+            ? `Last request: ${flag.value}`
+            : "Last request: no filter"}
+        </div>
       </header>
       <main className="main container">
         <h2>Список товара</h2>
