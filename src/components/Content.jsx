@@ -6,7 +6,8 @@ import { removeDuplicates } from "../helpers/removeDuplicates"; // функци�
 import { Spin } from "./Spin"; // этот спинер показан во время запроса
 import { Pagination } from "./Pagination"; // тут отрисовывается пагинация
 sessionStorage.removeItem("currentPageNumber");
-const API_URL = "http://api.valantis.store:40000/";
+const API_URL = "https://api.valantis.store:41000/"; // Для деплоя
+// "http://api.valantis.store:40000/"; Для разработки 
 const itemsPerPage = 50; // сколько показывать карточек на одной странице
 let defaultFilter = {
   action: "get_ids",
