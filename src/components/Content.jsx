@@ -77,7 +77,7 @@ export const Content = ({ flag }) => {
         );
         setArrayData(uniqueArray);
       } catch (error) {
-        console.clear();
+        // console.clear();
         console.error(`Error: ${error.message}`);
         setFirstRequestError(error.message);
       } finally {
@@ -118,7 +118,7 @@ export const Content = ({ flag }) => {
 
         setDisplayedProducts(finalResultFromServer);
       } catch (error) {
-        console.clear();
+        // console.clear();
         console.error(`Error: ${error.message}`);
         setSecondRequestError(error.message);
       } finally {
